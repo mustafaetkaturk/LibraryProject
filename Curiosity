@@ -26,12 +26,13 @@ public class Curiosity {
         String RightLastName=LastName(RightFullName);
         List<author__c> Author=[SELECT Id, Name__c, Last_Name__c FROM Author__c WHERE Name__c=:WrongName AND Last_Name__c=:WrongLastName];
         If(Author.isEmpty()){
-            Author.clear();
-            Author=[SELECT Id, Name__c, Last_Name__c FROM Author__c WHERE Name__c=:WrongLastName AND Last_Name__c=:WrongName];
+		System.debug('There is no Author found with ' + WrongFullName);
+	}else{
+		Author[0].Name__c=RightName;
+        	Author[0].Last_Name__c=RightLastName;
+        	update Author;
         }
-        Author[0].Name__c=RightName;
-        Author[0].Last_Name__c=RightLastName;
-        update Author;
+
     }
     Public static String Name(String FullName){
 		String Name=FullName.left(FullName.length()-FullName.reverse().indexof(' ')-1);
