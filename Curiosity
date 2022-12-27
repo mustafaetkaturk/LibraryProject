@@ -1,0 +1,44 @@
+public class Curiosity {
+    public static void Curiosity(String Name, String LastName){
+        List<Member__c> Members= [SELECT Name__c, Last_Name__c, Id FROM Member__c WHERE Name__c=:Name AND Last_Name__c=:LastName ];
+        if(!Members.isEmpty()){
+			System.Debug('Yes, ' + Name+ ' '+LastName+' is a Member');
+            System.debug(BooksRead(Members[0].Id));
+        }
+    }
+    Public static List<Borrow__c> BooksRead(Id memberId){
+        List<Borrow__c> Borrows=[SELECT 	Member__r.Name,
+               								Member__r.Last_Name__c,
+                       						Book__r.Name, 
+                        					Book__r.Author__r.Name__c,
+                        					Book__r.Author__r.Last_Name__c
+                				FROM Borrow__c 
+                				WHERE Member__r.Id=:memberId];
+        if(Borrows.isEmpty()){
+           System.debug('This member never borrowed a book from our library'); 
+        }
+        return Borrows;   
+    }
+    Public static void CorrectAuthorName(String WrongFullName, String RightFullName){
+        String WrongName=Name(WrongFullName);
+        String WrongLastName=LastName(WrongFullName);
+        String RightName=Name(RightFullName);
+        String RightLastName=LastName(RightFullName);
+        List<author__c> Author=[SELECT Id, Name__c, Last_Name__c FROM Author__c WHERE Name__c=:WrongName AND Last_Name__c=:WrongLastName];
+        If(Author.isEmpty()){
+            Author.clear();
+            Author=[SELECT Id, Name__c, Last_Name__c FROM Author__c WHERE Name__c=:WrongLastName AND Last_Name__c=:WrongName];
+        }
+        Author[0].Name__c=RightName;
+        Author[0].Last_Name__c=RightLastName;
+        update Author;
+    }
+    Public static String Name(String FullName){
+		String Name=FullName.left(FullName.length()-FullName.reverse().indexof(' ')-1);
+        return Name;
+    }
+    Public static String LastName(String FullName){
+        String LastName=FullName.right(FullName.reverse().indexof(' '));
+        Return LastName;
+    }
+}
